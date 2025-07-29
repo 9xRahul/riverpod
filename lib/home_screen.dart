@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'slider_provider.dart';
 
 final counter = StateProvider<int>((ref) {
   return 0;
@@ -17,6 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  double? tempSlider;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +68,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                     ))
               ],
-            )
+            ),
+            Consumer(builder: (context, ref, chil) {
+              final tempSlider = ref.watch(slider);
+              return Container(
+                height: 100,
+                width: 100,
+                color: Colors.red.withOpacity(tempSlider),
+              );
+            }),
+            Consumer(builder: (context, ref, child) {
+              final tempSlider = ref.watch(slider);
+              return Slider(
+                  value: tempSlider!,
+                  onChanged: (value) {
+                    ref.read(slider.notifier).state = value;
+                  });
+            })
           ],
         ),
       ),
