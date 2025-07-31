@@ -70,19 +70,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
             Consumer(builder: (context, ref, chil) {
-              final tempSlider = ref.watch(slider);
-              return Container(
-                height: 100,
-                width: 100,
-                color: Colors.red.withOpacity(tempSlider),
+              print("build");
+              final tempSlider =
+                  ref.watch(slider.select((state) => state.showPassword));
+              final tempSlir =
+                  ref.watch(slider.select((state) => state.slider));
+              return GestureDetector(
+                onTap: () {
+                  final stateProvider = ref.read(slider.notifier);
+                  stateProvider.state =
+                      stateProvider.state.copyWith(showPassword: !tempSlider);
+                },
+                child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(color: Colors.red.withOpacity(tempSlir)),
+                  child: Icon(
+                      tempSlider ? Icons.remove_red_eye : Icons.password_sharp),
+                ),
               );
             }),
             Consumer(builder: (context, ref, child) {
-              final tempSlider = ref.watch(slider);
+              final tempSlider =
+                  ref.watch(slider.select((state) => state.slider));
               return Slider(
-                  value: tempSlider!,
+                  value: tempSlider,
                   onChanged: (value) {
-                    ref.read(slider.notifier).state = value;
+                    final stateProvider = ref.read(slider.notifier);
+                    stateProvider.state =
+                        stateProvider.state.copyWith(slider: value);
                   });
             })
           ],

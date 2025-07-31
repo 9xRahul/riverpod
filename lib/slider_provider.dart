@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final slider = StateProvider<double>((ref) {
-  return .2;
+final slider = StateProvider<AppState>((ref) {
+  return AppState(slider: .5, showPassword: false);
 });
 
 class AppState {
