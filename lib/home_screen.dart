@@ -1,117 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'slider_provider.dart';
+import 'search_provider.dart';
 
-final counter = StateProvider<int>((ref) {
-  return 0;
-});
-
-final toggle = StateProvider<bool>((ref) {
-  return false;
-});
-
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  double? tempSlider;
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Riverpod"),
+        title: Text("StateNotifier"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Consumer(builder: (context, ref, child) {
-              final tempCounter = ref.watch(counter);
-              return Text(
-                "$tempCounter",
-                style: TextStyle(fontSize: 20),
-              );
-            }),
-            Consumer(builder: (context, ref, child) {
-              final tempToggle = ref.watch(toggle);
-
-              return Switch(
-                  value: tempToggle,
-                  onChanged: (value) {
-                    ref.read(toggle.notifier).state = value;
-                  });
-            }),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                    onPressed: () {
-                      ref.read(counter.notifier).state--;
-                    },
-                    child: Text(
-                      "-",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    )),
-                ElevatedButton(
-                    onPressed: () {
-                      ref.read(counter.notifier).state++;
-                    },
-                    child: Text(
-                      "+",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    ))
-              ],
-            ),
-            Consumer(builder: (context, ref, chil) {
-              print("build");
-              final tempSlider =
-                  ref.watch(slider.select((state) => state.showPassword));
-              final tempSlir =
-                  ref.watch(slider.select((state) => state.slider));
-              return GestureDetector(
-                onTap: () {
-                  final stateProvider = ref.read(slider.notifier);
-                  stateProvider.state =
-                      stateProvider.state.copyWith(showPassword: !tempSlider);
-                },
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(color: Colors.red.withOpacity(tempSlir)),
-                  child: Icon(
-                      tempSlider ? Icons.remove_red_eye : Icons.password_sharp),
-                ),
-              );
-            }),
-            Consumer(builder: (context, ref, child) {
-              final tempSlider =
-                  ref.watch(slider.select((state) => state.slider));
-              return Slider(
-                  value: tempSlider,
-                  onChanged: (value) {
-                    final stateProvider = ref.read(slider.notifier);
-                    stateProvider.state =
-                        stateProvider.state.copyWith(slider: value);
-                  });
-            })
-          ],
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          TextField(
+            onChanged: (value) {
+              ref.read(searchProvider.notifier).search(query: value);
+            },
+          ),
+          Consumer(builder: (context, ref, child) {
+            final search =
+                ref.watch((searchProvider).select((state) => state.search));
+            return Text(search);
+          }),
+          Consumer(builder: (context, ref, child) {
+            final isChanged =
+                ref.watch((searchProvider).select((state) => state.isChanged));
+            return Switch(
+              value: isChanged,
+              onChanged: (value) {
+                ref.read(searchProvider.notifier).isChanged(isChanged: value);
+              },
+            );
+          })
+        ],
       ),
     );
   }
 }
-// class HomeScreen extends ConsumerWidget {
+
+// class HomeScreen extends ConsumerStatefulWidget {
 //   const HomeScreen({super.key});
 
 //   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
+//   ConsumerState<HomeScreen> createState() => _HomeScreenState();
+// }
+
+// class _HomeScreenState extends ConsumerState<HomeScreen> {
+//   @override
+//   Widget build(BuildContext context) {
 //     return Scaffold(
 //       appBar: AppBar(
 //         title: Text("Riverpod"),
@@ -120,98 +60,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 //         padding: const EdgeInsets.all(8.0),
 //         child: Column(
 //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//           children: [
-//             Consumer(builder: (context, ref, child) {
-//               final tempCounter = ref.watch(counter);
-//               return Text(
-//                 "$tempCounter",
-//                 style: TextStyle(fontSize: 20),
-//               );
-//             }),
-//             Consumer(builder: (context, ref, child) {
-//               final tempToggle = ref.watch(toggle);
-
-//               return Switch(
-//                   value: tempToggle,
-//                   onChanged: (value) {
-//                     ref.read(toggle.notifier).state = value;
-//                   });
-//             }),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 ElevatedButton(
-//                     onPressed: () {
-//                       ref.read(counter.notifier).state--;
-//                     },
-//                     child: Text(
-//                       "-",
-//                       style:
-//                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-//                     )),
-//                 ElevatedButton(
-//                     onPressed: () {
-//                       ref.read(counter.notifier).state++;
-//                     },
-//                     child: Text(
-//                       "+",
-//                       style:
-//                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-//                     ))
-//               ],
-//             )
-//           ],
+//           children: [],
 //         ),
-//       ),
-//     );
-//   }
-// }
-
-// class HomeScreen extends ConsumerStatefulWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   ConsumerState<HomeScreen> createState() => _HomeScreenState();
-// }
-
-// class _HomeScreenState extends ConsumerState<HomeScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Riverpod"),
-//       ),
-//       body: Text(
-//         "days",
-//         style: TextStyle(fontSize: 20),
-//       ),
-//     );
-//   }
-// }
-
-// class HomeScreen extends ConsumerStatefulWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   ConsumerState<HomeScreen> createState() => _HomeScreenState();
-// }
-
-// class _HomeScreenState extends ConsumerState<HomeScreen> {
-
-//   final days = Provider<int>((ref) {
-//     return 10;
-//   });
-//   @override
-//   Widget build(BuildContext context) {
-//     final counterValue = ref.watch(counter);
-//     final tempDays = ref.watch(days);
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Riverpod"),
-//       ),
-//       body: Text(
-//         "$learn in $tempDays days",
-//         style: TextStyle(fontSize: 20),
 //       ),
 //     );
 //   }
