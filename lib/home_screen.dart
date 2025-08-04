@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_learning/item_provider.dart';
 import 'slider_provider.dart';
 import 'search_provider.dart';
 
@@ -8,61 +9,47 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final item = ref.watch(itemProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text("StateNotifier"),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          TextField(
-            onChanged: (value) {
-              ref.read(searchProvider.notifier).search(query: value);
-            },
-          ),
-          Consumer(builder: (context, ref, child) {
-            final search =
-                ref.watch((searchProvider).select((state) => state.search));
-            return Text(search);
-          }),
-          Consumer(builder: (context, ref, child) {
-            final isChanged =
-                ref.watch((searchProvider).select((state) => state.isChanged));
-            return Switch(
-              value: isChanged,
-              onChanged: (value) {
-                ref.read(searchProvider.notifier).isChanged(isChanged: value);
-              },
-            );
-          })
-        ],
+      body: item.isEmpty
+          ? Center(child: Text("No data added"))
+          : ListView.builder(
+              itemCount: item.length,
+              itemBuilder: (context, index) {
+                final itemetail = item[index];
+                return ListTile(
+                  title: Text(itemetail.name),
+                  trailing: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            ref
+                                .read(itemProvider.notifier)
+                                .deleteItem(id: itemetail.id);
+                          },
+                          icon: Icon(Icons.delete)),
+                      IconButton(
+                          onPressed: () {
+                            ref.read(itemProvider.notifier).updateitem(
+                                id: itemetail.id, updatedName: "Updated Name");
+                          },
+                          icon: Icon(Icons.update)),
+                    ],
+                  ),
+                );
+              }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          ref.read(itemProvider.notifier).addItem(itemName: "New item");
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
 }
-
-// class HomeScreen extends ConsumerStatefulWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   ConsumerState<HomeScreen> createState() => _HomeScreenState();
-// }
-
-// class _HomeScreenState extends ConsumerState<HomeScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Riverpod"),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(8.0),
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//           children: [],
-//         ),
-//       ),
-//     );
-//   }
-// }
